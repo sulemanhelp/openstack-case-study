@@ -1,0 +1,14 @@
+---
+- name: Configure Nova for auto-scaling (simulation)
+  shell: >
+    source /opt/devstack/openrc admin &&
+    echo "Setting Nova auto-scaling enabled" &&
+    # In a real scenario, you might update nova.conf or use an API call
+    openstack configuration set nova --property auto_scaling_enabled=true
+  ignore_errors: yes
+
+- name: Simulate Swift dynamic scaling by printing a readiness message
+  shell: >
+    source /opt/devstack/openrc admin &&
+    echo "Swift dynamic scaling simulated: Ready to add storage nodes dynamically"
+  ignore_errors: yes

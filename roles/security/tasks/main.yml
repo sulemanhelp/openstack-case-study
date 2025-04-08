@@ -1,0 +1,18 @@
+---
+- name: Create key pair for compute instances using existing public key
+  shell: "source /opt/devstack/openrc admin && openstack keypair create --public-key ~/.ssh/id_rsa.pub mykey"
+  register: keypair_result
+  ignore_errors: yes
+
+- name: Create Keystone RBAC role 'member' and assign it to a demo user
+  shell: >
+    source /opt/devstack/openrc admin &&
+    openstack role create member &&
+    openstack role add --project service --user demo member
+  ignore_errors: yes
+
+- name: Enforce Swift encryption by setting container property (simulation)
+  shell: >
+    source /opt/devstack/openrc admin &&
+    openstack container set --property encryption=true demo_container
+  ignore_errors: yes

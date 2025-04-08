@@ -1,0 +1,26 @@
+---
+- name: Clone DevStack repository if not already present
+  git:
+    repo: "https://opendev.org/openstack/devstack.git"
+    dest: /opt/devstack
+    version: master
+
+- name: Create DevStack configuration file from template
+  template:
+    src: local.conf.j2
+    dest: /opt/devstack/local.conf
+    mode: '0644'
+
+- name: Run DevStack installation script
+  shell: "./stack.sh"
+  args:
+    chdir: /opt/devstack
+  environment:
+    DEVSTACK_HA: "true"  # Simulate HA by enabling multiple service processes
+  register: devstack_install
+  ignore_errors: yes
+
+- name: Fail if DevStack installation failed
+  fail:
+    msg: "DevStack installation failed, rolling back deployment."
+  when: devstack_install.rc != 0

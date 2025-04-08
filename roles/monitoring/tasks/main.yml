@@ -1,0 +1,19 @@
+---
+- name: Check if Ceilometer is deployed; if not, log that it will be deployed
+  shell: "source /opt/devstack/openrc admin && openstack service list | grep ceilometer || echo 'Deploying Ceilometer'"
+  register: ceilometer_check
+  ignore_errors: yes
+
+- name: Configure centralized logging for OpenStack services via rsyslog
+  copy:
+    dest: /etc/rsyslog.d/90-openstack.conf
+    content: |
+      # Centralized logging for OpenStack services
+      if ($programname == 'nova' or $programname == 'swift' or $programname == 'trove') then /var/log/openstack.log
+      & stop
+  notify: Restart rsyslog
+
+- name: Restart rsyslog service to apply logging configuration
+  service:
+    name: rsyslog
+    state: restarted

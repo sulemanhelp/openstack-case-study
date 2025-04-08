@@ -1,0 +1,17 @@
+---
+- name: Rollback DevStack installation by removing /opt/devstack directory
+  file:
+    path: /opt/devstack
+    state: absent
+
+- name: Rollback network configuration (delete router, public and private networks)
+  shell: >
+    source /opt/devstack/openrc admin &&
+    openstack router delete router1 &&
+    openstack network delete public &&
+    openstack network delete private
+  ignore_errors: yes
+
+- name: Delete security group used for network access
+  shell: "source /opt/devstack/openrc admin && openstack security group delete ha-sec-group"
+  ignore_errors: yes

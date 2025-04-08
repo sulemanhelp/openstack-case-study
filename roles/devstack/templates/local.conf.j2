@@ -1,0 +1,39 @@
+[[local|localrc]]
+# Credentials
+ADMIN_PASSWORD=secret
+DATABASE_PASSWORD=secret
+RABBIT_PASSWORD=secret
+SERVICE_PASSWORD=secret
+
+# Enable core OpenStack services
+enable_service n-api
+enable_service n-crt
+enable_service n-cpu
+enable_service n-sch
+enable_service n-cond
+enable_service q-svc
+enable_service q-agt
+enable_service q-dhcp
+enable_service q-l3
+enable_service q-meta
+enable_service horizon
+enable_service swift
+enable_service trove
+enable_service ceilometer
+enable_service key
+
+# Networking configuration
+HOST_IP={{ ansible_default_ipv4.address }}
+FLOATING_RANGE=172.24.4.0/24
+FIXED_RANGE=10.0.0.0/24
+FIXED_NETWORK_SIZE=255
+
+# High Availability (HA) simulation parameters
+DEVSTACK_HA=true
+
+# Security enhancements
+# (Simulated Swift encryption flag; real encryption may require further configuration)
+SWIFT_ENCRYPTION=true
+
+# Auto-scaling configuration parameters for Nova (simulation)
+AUTO_SCALING=true

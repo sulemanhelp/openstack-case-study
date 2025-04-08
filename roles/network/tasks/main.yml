@@ -1,0 +1,44 @@
+---
+- name: Source DevStack credentials and verify token issuance
+  shell: "source /opt/devstack/openrc admin && openstack token issue"
+  register: token_check
+  changed_when: false
+
+- name: Create public network
+  shell: "source /opt/devstack/openrc admin && openstack network create public --external"
+  register: public_network
+  ignore_errors: yes
+
+- name: Create public subnet
+  shell: >
+    source /opt/devstack/openrc admin &&
+    openstack subnet create --network public --allocation-pool start=172.24.4.10,end=172.24.4.200 --subnet-range 172.24.4.0/24 public_subnet
+  ignore_errors: yes
+
+- name: Create private network
+  shell: "source /opt/devstack/openrc admin && openstack network create private"
+  ignore_errors: yes
+
+- name: Create private subnet
+  shell: "source /opt/devstack/openrc admin && openstack subnet create --network private --subnet-range 10.0.0.0/24 private_subnet"
+  ignore_errors: yes
+
+- name: Create router and attach private subnet to public network
+  shell: >
+    source /opt/devstack/openrc admin &&
+    openstack router create router1 &&
+    openstack router add subnet router1 private_subnet &&
+    openstack router set router1 --external-gateway public
+  ignore_errors: yes
+
+- name: Create security group for network access
+  shell: "source /opt/devstack/openrc admin && openstack security group create ha-sec-group"
+  ignore_errors: yes
+
+- name: Add firewall rules to security group for SSH, HTTP, and Nova API access
+  shell: >
+    source /opt/devstack/openrc admin &&
+    openstack security group rule create ha-sec-group --protocol tcp --dst-port 22:22 &&
+    openstack security group rule create ha-sec-group --protocol tcp --dst-port 80:80 &&
+    openstack security group rule create ha-sec-group --protocol tcp --dst-port 8774:8774
+  ignore_errors: yes

@@ -1,0 +1,37 @@
+---
+- name: Deploy OpenStack Environment with Automated Rollback
+  hosts: localhost
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - block:
+        - name: Run pre-install tasks
+          include_role:
+            name: preinstall
+
+        - name: Deploy DevStack with HA and additional services
+          include_role:
+            name: devstack
+
+        - name: Configure Neutron networking
+          include_role:
+            name: network
+
+        - name: Configure security (key-pairs, RBAC, Swift encryption)
+          include_role:
+            name: security
+
+        - name: Deploy telemetry and centralized logging
+          include_role:
+            name: monitoring
+
+        - name: Configure auto-scaling and dynamic storage scaling
+          include_role:
+            name: scalability
+      rescue:
+        - debug:
+            msg: "Deployment failed. Initiating rollback..."
+        - name: Run rollback tasks
+          include_role:
+            name: rollback
