@@ -5,6 +5,9 @@ DATABASE_PASSWORD=secret
 RABBIT_PASSWORD=secret
 SERVICE_PASSWORD=secret
 
+# Set the host IP explicitly using the variable defined in your inventory.
+HOST_IP={{ host_ip | default(ansible_default_ipv4.address) }}
+
 # Enable core OpenStack services
 enable_service n-api
 enable_service n-crt
@@ -23,7 +26,6 @@ enable_service ceilometer
 enable_service key
 
 # Networking configuration
-HOST_IP={{ ansible_default_ipv4.address }}
 FLOATING_RANGE=172.24.4.0/24
 FIXED_RANGE=10.0.0.0/24
 FIXED_NETWORK_SIZE=255
